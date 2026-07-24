@@ -15,13 +15,36 @@
             -webkit-user-select: none; user-select: none;
         }
         h2 { text-align: center; margin-top: 10px; font-size: 22px; }
+        
+        /* Стили для кнопок категорий */
+        .categories-tabs {
+            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px;
+            scrollbar-width: none; /* скрываем скроллбар в Firefox */
+        }
+        .categories-tabs::-webkit-scrollbar { display: none; } /* скрываем скроллбар в Chrome */
+        
+        .tab-btn {
+            background-color: var(--tg-theme-secondary-bg-color, #fff);
+            color: var(--tg-theme-text-color, #1d1d1f);
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
+            padding: 8px 16px; font-size: 14px; font-weight: 500;
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: var(--tg-theme-button-color, #0071e3);
+            color: var(--tg-theme-button-text-color, #fff);
+            border-color: transparent;
+        }
+
+        /* Сетка товаров */
         .products-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;
         }
         .card {
             background-color: var(--tg-theme-secondary-bg-color, #fff);
             border-radius: 16px; padding: 12px; display: flex; flex-direction: column;
             align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: all 0.2s;
         }
         .icon { font-size: 44px; margin-bottom: 8px; }
         .title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; }
@@ -38,31 +61,38 @@
 <body>
 
     <h2>🤖 Tech & Gadgets</h2>
+    
+    <!-- Вкладки категорий -->
+    <div class="categories-tabs">
+        <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
+        <button class="tab-btn" onclick="filterCategory('gadgets', this)">⌚ Гаджеты</button>
+        <button class="tab-btn" onclick="filterCategory('power', this)">🔌 Зарядки</button>
+    </div>
 
+    <!-- Витрина товаров -->
     <div class="products-grid">
-        <!-- Товар 1 -->
-        <div class="card">
+        <!-- Категория: Гаджеты -->
+        <div class="card" data-category="gadgets">
             <div class="icon">🎧</div>
             <div class="title">Наушники Pro</div>
             <div class="price">14 900 ₽</div>
             <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
         </div>
-        <!-- Товар 2 -->
-        <div class="card">
+        <div class="card" data-category="gadgets">
             <div class="icon">⌚</div>
             <div class="title">Умные Часы X</div>
             <div class="price">24 500 ₽</div>
             <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
         </div>
-        <!-- Товар 3 -->
-        <div class="card">
+        
+        <!-- Категория: Зарядки -->
+        <div class="card" data-category="power">
             <div class="icon">🔋</div>
             <div class="title">Повербанк 20k</div>
             <div class="price">3 200 ₽</div>
             <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
         </div>
-        <!-- Товар 4 -->
-        <div class="card">
+        <div class="card" data-category="power">
             <div class="icon">🔌</div>
             <div class="title">Зарядка GaN</div>
             <div class="price">2 100 ₽</div>
@@ -72,29 +102,39 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Открываем приложение на максимум
+        tg.expand();
 
         let cart = [];
         let total = 0;
+
+        // Функция фильтрации категорий
+        function filterCategory(category, button) {
+            // Переключаем активный класс у кнопок
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            # Показываем или скрываем карточки товаров
+            document.querySelectorAll('.card').forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
         function addToCart(name, price) {
             cart.push({ name, price });
             total += price;
 
-            // Настраиваем большую нижнюю кнопку Telegram
             tg.MainButton.text = `🛒 Оформить заказ: ${total.toLocaleString()} ₽`;
             tg.MainButton.textColor = '#ffffff';
-            tg.MainButton.color = '#2ec76e'; // Красивый зеленый цвет кнопки заказа
+            tg.MainButton.color = '#2ec76e';
             tg.MainButton.show();
         }
 
-        // Ловим клик по большой кнопке Telegram
         tg.onEvent('mainButtonClicked', function() {
-            const dataToSend = {
-                items: cart,
-                total: total
-            };
-            // Отправляем данные боту и закрываем окно
+            const dataToSend = { items: cart, total: total };
             tg.sendData(JSON.stringify(dataToSend));
             tg.close();
         });

@@ -178,3 +178,73 @@
             </div>
         </div>
     </div>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        let cart = {};
+
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if (pageId === 'welcome-page') { tg.MainButton.hide(); }
+            else if (pageId === 'catalog-page' && calculateTotal() > 0) { tg.MainButton.show(); }
+        }
+
+        function filterCategory(category, button) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.querySelectorAll('.card').forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) { card.style.display = 'flex'; }
+                else { card.style.display = 'none'; }
+            });
+        }
+
+        function changeQuantity(id, name, price, delta) {
+            if (!cart[id]) { cart[id] = { name: name, price: price, count: 0 }; }
+            cart[id].count += delta;
+
+            const card = document.getElementById(`prod-${id}`);
+            const btnAdd = card.querySelector('.btn-add');
+            const counterContainer = card.querySelector('.counter-container');
+            const counterValue = card.querySelector('.counter-value');
+
+            if (cart[id].count > 0) {
+                btnAdd.style.display = 'none';
+                counterContainer.style.display = 'flex';
+                counterValue.innerText = cart[id].count;
+            } else {
+                delete cart[id];
+                btnAdd.style.display = 'block';
+                counterContainer.style.display = 'none';
+            }
+            updateMainButton();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            for (let id in cart) { total += cart[id].price * cart[id].count; }
+            return total;
+        }
+
+        function updateMainButton() {
+            const total = calculateTotal();
+            if (total > 0) {
+                tg.MainButton.text = `🛒 Оформить заказ: ${total.toLocaleString()} ₽`;
+                tg.MainButton.textColor = '#ffffff';
+                tg.MainButton.color = '#2ec76e';
+                tg.MainButton.show();
+            } else { tg.MainButton.hide(); }
+        }
+
+        tg.onEvent('mainButtonClicked', function() {
+            let itemsToSend = [];
+            for (let id in cart) {
+                itemsToSend.push({ name: `${cart[id].name} (x${cart[id].count})`, price: cart[id].price * cart[id].count });
+            }
+            const dataToSend = { items: itemsToSend, total: calculateTotal() };
+            tg.sendData(JSON.stringify(dataToSend));
+            tg.close();
+        });
+    </script>
+</body>
+</html>

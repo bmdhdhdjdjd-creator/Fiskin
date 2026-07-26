@@ -403,7 +403,7 @@
     top: 50%;
     transform: translateY(-50%);
     z-index: 30;
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     gap: 6px;
@@ -417,6 +417,7 @@
     transition: padding-left .15s ease, border-color .15s ease;
     text-decoration: none;
   }
+  .support-tab.visible{ display: flex; }
   .support-tab:active{ padding-left: 6px; }
   .support-tab .support-led{
     width: 6px; height: 6px; border-radius: 50%;
@@ -675,10 +676,10 @@
   <div class="section-title">Каталог</div>
 
   <div class="categories-tabs">
-    <button class="tab-btn active" onclick="filterCategory('all', this)">Все</button>
-    <button class="tab-btn" onclick="filterCategory('devices', this)">Устройства</button>
-    <button class="tab-btn" onclick="filterCategory('modules', this)">Модули</button>
-    <button class="tab-btn" onclick="filterCategory('accessories', this)">Аксессуары</button>
+    <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
+    <button class="tab-btn" onclick="filterCategory('devices', this)">📟 Устройства</button>
+    <button class="tab-btn" onclick="filterCategory('modules', this)">🔩 Модули</button>
+    <button class="tab-btn" onclick="filterCategory('accessories', this)">🛡️ Аксессуары</button>
   </div>
 
   <div class="products-grid">
@@ -757,7 +758,7 @@
 
   </div>
 
-  <div class="footer-note">Зачем ты это читаешь'?</div>
+  <div class="footer-note">fiskin_shop // made for makers</div>
 
 </div>
 
@@ -785,8 +786,8 @@
   const tg = window.Telegram ? window.Telegram.WebApp : null;
   if (tg) tg.expand();
 
-  // Юзернейм оператора в Telegram
-  const SUPPORT_USERNAME = 'NigaSupport';
+  // Юзернейм саппорт-бота/оператора в Telegram — замените на реальный.
+  const SUPPORT_USERNAME = 'fiskin_support';
 
   function openSupport() {
     const url = `https://t.me/${SUPPORT_USERNAME}`;
@@ -812,6 +813,7 @@
   function navigateTo(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
+    document.getElementById('support-tab').classList.toggle('visible', pageId !== 'welcome-page');
   }
 
   function filterCategory(category, button) {

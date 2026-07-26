@@ -19,9 +19,9 @@
         /* Стили для кнопок категорий */
         .categories-tabs {
             display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px;
-            scrollbar-width: none; /* скрываем скроллбар в Firefox */
+            scrollbar-width: none;
         }
-        .categories-tabs::-webkit-scrollbar { display: none; } /* скрываем скроллбар в Chrome */
+        .categories-tabs::-webkit-scrollbar { display: none; }
 
         .tab-btn {
             background-color: var(--tg-theme-secondary-bg-color, #fff);
@@ -45,8 +45,18 @@
             border-radius: 16px; padding: 12px; display: flex; flex-direction: column;
             align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
             transition: all 0.2s;
+            position: relative; overflow: hidden;
         }
-        .icon { font-size: 44px; margin-bottom: 8px; }
+
+        /* 📸 НОВЫЕ СТИЛИ ДЛЯ ФОТОГРАФИЙ */
+        .product-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain; /* Картинка пропорционально впишется в блок */
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
         .title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; }
         .price { font-size: 15px; font-weight: bold; color: var(--tg-theme-link-color, #0071e3); margin-bottom: 12px; }
         .btn-add {
@@ -60,38 +70,39 @@
 </head>
 <body>
 
-    <h2>Бурмалда</h2>
+    <h2>🤖 Tech & Gadgets</h2>
 
-    <!-- Вкладки категорий -->
     <div class="categories-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)"> Все товары</button>
-        <button class="tab-btn" onclick="filterCategory('gadgets', this)"> Гаджеты</button>
-        <button class="tab-btn" onclick="filterCategory('power', this)"> Зарядки</button>
+        <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
+        <button class="tab-btn" onclick="filterCategory('gadgets', this)">⌚ Гаджеты</button>
+        <button class="tab-btn" onclick="filterCategory('power', this)">🔌 Зарядки</button>
     </div>
 
-    <!-- Витрина товаров -->
     <div class="products-grid">
-        <!-- Категория: Гаджеты -->
+        <!-- Гаджеты -->
         <div class="card" data-category="gadgets">
-            <div class="title">Flipper Zero</div>
-            <div class="price">20 000 - 25 000 ₽</div>
-            <button class="btn-add" onclick="addToCart('Flipper Zero', 20_000 - 25_000)">В корзину</button>
+            <img class="product-img" src="Flipper Zero.jfif" alt="Наушники Pro">
+            <div class="title">Наушники Pro</div>
+            <div class="price">14 900 ₽</div>
+            <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
         </div>
         <div class="card" data-category="gadgets">
-            <div class="title">Flipper One</div>
-            <div class="price">45 000 - 60 000 ₽</div>
-            <button class="btn-add" onclick="addToCart('Flipper One', 45_000 - 60_000)">В корзину</button>
+            <img class="product-img" src="flipper-one.jpg" alt="Умные Часы X">
+            <div class="title">Умные Часы X</div>
+            <div class="price">24 500 ₽</div>
+            <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
         </div>
 
-        <!-- Категория: Зарядки -->
+        <!-- Зарядки -->
         <div class="card" data-category="power">
-            <div class="title">Steam</div>
-            <div class="price">Бесплатно</div>
-            <button class="btn-add" onclick="addToCart('Steam', 'Бесплатно')">В корзину</button>
+            <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
+            <div class="title">Повербанк 20k</div>
+            <div class="price">3 200 ₽</div>
+            <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
         </div>
         <div class="card" data-category="power">
-            <div class="icon"></div>
-            <div class="title">Лапти</div>
+            <img class="product-img" src="charger.png" alt="Зарядка GaN">
+            <div class="title">Зарядка GaN</div>
             <div class="price">2 100 ₽</div>
             <button class="btn-add" onclick="addToCart('Зарядка GaN', 2100)">В корзину</button>
         </div>
@@ -104,13 +115,10 @@
         let cart = [];
         let total = 0;
 
-        // Функция фильтрации категорий
         function filterCategory(category, button) {
-            // Переключаем активный класс у кнопок
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
-            # Показываем или скрываем карточки товаров
             document.querySelectorAll('.card').forEach(card => {
                 if (category === 'all' || card.getAttribute('data-category') === category) {
                     card.style.display = 'flex';

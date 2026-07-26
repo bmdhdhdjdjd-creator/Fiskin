@@ -48,7 +48,7 @@
             position: relative; overflow: hidden;
         }
 
-        /* 📸 НОВЫЕ СТИЛИ ДЛЯ ФОТОГРАФИЙ */
+        /*  НОВЫЕ СТИЛИ ДЛЯ ФОТОГРАФИЙ */
         .product-img {
             width: 100%;
             height: 120px;
@@ -70,33 +70,33 @@
 </head>
 <body>
 
-    <h2>🤖 Tech & Gadgets</h2>
+    <h2>Бурмалда</h2>
 
     <div class="categories-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
-        <button class="tab-btn" onclick="filterCategory('gadgets', this)">⌚ Гаджеты</button>
-        <button class="tab-btn" onclick="filterCategory('power', this)">🔌 Зарядки</button>
+        <button class="tab-btn active" onclick="filterCategory('all', this)">Все товары</button>
+        <button class="tab-btn" onclick="filterCategory('gadgets', this)">Flipper</button>
+        <button class="tab-btn" onclick="filterCategory('power', this)">Зарядки</button>
     </div>
 
     <div class="products-grid">
         <!-- Гаджеты -->
         <div class="card" data-category="gadgets">
-            <img class="product-img" src="Flipper Zero.jfif" alt="Наушники Pro">
-            <div class="title">Наушники Pro</div>
-            <div class="price">14 900 ₽</div>
+            <img class="product-img" src="Flipper Zero.jpg" alt="Наушники Pro">
+            <div class="title">Flipper Zero</div>
+            <div class="price">25 000 ₽</div>
             <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
         </div>
         <div class="card" data-category="gadgets">
             <img class="product-img" src="flipper-one.jpg" alt="Умные Часы X">
-            <div class="title">Умные Часы X</div>
-            <div class="price">24 500 ₽</div>
+            <div class="title">Flipper One</div>
+            <div class="price">60 000 ₽</div>
             <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
         </div>
 
         <!-- Зарядки -->
         <div class="card" data-category="power">
             <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
-            <div class="title">Повербанк 20k</div>
+            <div class="title">Повербанк</div>
             <div class="price">3 200 ₽</div>
             <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
         </div>

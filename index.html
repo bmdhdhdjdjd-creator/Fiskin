@@ -1,452 +1,957 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Shop</title>
-    <script src="https://telegram.org"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--tg-theme-bg-color, #f5f5f7);
-            color: var(--tg-theme-text-color, #1d1d1f);
-            margin: 0;
-            padding: 0;
-            -webkit-user-select: none;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiskin — Flipper Zero Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
 
-        html {
-            scrollbar-gutter: stable; /* не даёт смещать плашке "Наш каталог" */
-        }
+  :root{
+    --bg: #0a0a0c;
+    --surface: #141418;
+    --surface-2: #1c1c22;
+    --line: rgba(255,255,255,0.07);
+    --text: #eef0f2;
+    --text-dim: #93939c;
+    --orange: #ff7a1a;
+    --orange-hi: #ffa84d;
+    --lcd: #9ad55c;
+    --radius: 18px;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
 
-        .page {
-            display: none;
-            padding: 16px;
-            box-sizing: border-box;
-        }
+  *{ box-sizing: border-box; }
 
-        .page.active {
-            display: block;
-        }
+  body{
+    font-family: var(--sans);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(255,122,26,0.08), transparent 40%),
+      var(--tg-theme-bg-color, var(--bg));
+    background-attachment: fixed;
+    color: var(--tg-theme-text-color, var(--text));
+    margin: 0;
+    padding: 0;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 
-        .welcome-container {
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 70vh;
-        }
+  html{ scrollbar-gutter: stable; }
 
-        .welcome-logo {
-            font-size: 72px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
+  ::selection{ background: rgba(255,122,26,0.35); }
 
-        .welcome-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
+  /* subtle circuit-dot texture */
+  .page::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events: none;
+    z-index: 0;
+  }
 
-        .welcome-desc {
-            font-size: 15px;
-            color: #8e8e93;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
+  .page{
+    display: none;
+    position: relative;
+    padding: 18px 16px 32px;
+  }
+  .page.active{ display: block; }
 
-        .btn-start {
-            background-color: var(--tg-theme-button-color, #0071e3);
-            color: var(--tg-theme-button-text-color, #fff);
-            border: none;
-            border-radius: 12px;
-            padding: 16px 32px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            max-width: 280px;
-            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
-        }
+  /* ---------- WELCOME ---------- */
+  .welcome-container{
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 82vh;
+  }
 
-        h2 {
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            font-size: 22px;
-            width: 100%;
-        }
+  .boot-eyebrow{
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--lcd);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .boot-eyebrow .dot{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lcd);
+    box-shadow: 0 0 8px var(--lcd);
+    animation: blink 1.4s infinite;
+  }
 
-        .promo-banner {
-            width: 100%;
-            height: 140px; /* Высота баннера */
-            object-fit: cover; /* Картинка красиво заполнит блок без искажений */
-            border-radius: 16px; /* Закругляем углы */
-            margin-bottom: 16px; /* Делаем отступ снизу, чтобы опустить категории и товары */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
+  .welcome-logo{
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    margin-bottom: 26px;
+    background: linear-gradient(160deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    box-shadow: 0 0 0 1px rgba(255,122,26,0.15), 0 18px 40px rgba(255,122,26,0.12);
+    animation: float 3.2s ease-in-out infinite;
+  }
 
-        .categories-tabs {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 4px 0 12px;
-            scrollbar-width: none;
-        }
+  .welcome-title{
+    font-family: var(--mono);
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    margin-bottom: 12px;
+  }
+  .welcome-title span{ color: var(--orange); }
 
-        .categories-tabs::-webkit-scrollbar {
-            display: none;
-        }
+  .welcome-desc{
+    font-size: 15px;
+    color: var(--text-dim);
+    margin-bottom: 34px;
+    line-height: 1.5;
+    max-width: 320px;
+  }
 
-        .tab-btn {
-            background-color: var(--tg-theme-secondary-bg-color, #fff);
-            color: var(--tg-theme-text-color, #1d1d1f);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
-        }
+  .btn-start{
+    background: linear-gradient(180deg, var(--orange-hi), var(--orange));
+    color: #14100a;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 32px;
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+    box-shadow: 0 10px 24px rgba(255,122,26,0.28);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-start:active{ transform: scale(0.97); box-shadow: 0 4px 12px rgba(255,122,26,0.25); }
 
-        .tab-btn.active {
-            background-color: var(--tg-theme-button-color, #0071e3);
-            color: var(--tg-theme-button-text-color, #fff);
-            border-color: transparent;
-        }
+  /* ---------- CATALOG ---------- */
+  .section-title{
+    position: relative;
+    z-index: 1;
+    font-family: var(--mono);
+    text-align: left;
+    margin: 4px 0 14px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
 
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 14px;
-            margin-top: 10px;
-            align-items: start;
-        }
+  .device-frame{
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 10px 10px 14px;
+    margin-bottom: 18px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  }
+  .device-frame .screw{
+    position: absolute;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #050506;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+  }
+  .device-frame .screw.tl{ top: 8px; left: 8px; }
+  .device-frame .screw.tr{ top: 8px; right: 8px; }
+  .device-frame .screw.bl{ bottom: 8px; left: 8px; }
+  .device-frame .screw.br{ bottom: 8px; right: 8px; }
 
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color, #fff);
-            border-radius: 16px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-            box-sizing: border-box;
-            height: 250px;
-            justify-content: space-between;
-        }
+  .promo-banner{
+    width: 100%;
+    height: 148px;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+  }
 
-        .product-img {
-            width: 100%;
-            height: 120px;
-            object-fit: contain;
-            margin-bottom: 10px;
-            border-radius: 8px;
-        }
+  .device-caption{
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--lcd);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 4px 2px;
+    letter-spacing: 0.04em;
+  }
+  .device-caption .led{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lcd);
+    box-shadow: 0 0 6px var(--lcd);
+    margin-right: 6px;
+    display: inline-block;
+  }
 
-        .title {
-            font-size: 14px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 4px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
+  .categories-tabs{
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 0 16px;
+    scrollbar-width: none;
+  }
+  .categories-tabs::-webkit-scrollbar{ display: none; }
 
-        .price {
-            font-size: 15px;
-            font-weight: bold;
-            color: var(--tg-theme-link-color, #0071e3);
-            margin-bottom: 12px;
-        }
+  .tab-btn{
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 9px 16px;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .15s ease;
+  }
+  .tab-btn.active{
+    background: rgba(255,122,26,0.12);
+    color: var(--orange-hi);
+    border-color: rgba(255,122,26,0.4);
+    box-shadow: 0 0 0 1px rgba(255,122,26,0.15) inset;
+  }
 
-        .btn-add {
-            background-color: var(--tg-theme-button-color, #0071e3);
-            color: var(--tg-theme-button-text-color, #fff);
-            border: none;
-            border-radius: 8px;
-            padding: 8px 16px;
-            width: 100%;
-            font-weight: 500;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
+  .products-grid{
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    align-items: start;
+  }
 
-        .counter-container {
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-        }
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    min-height: 264px;
+    justify-content: space-between;
+    transition: border-color .2s ease, transform .2s ease;
+    animation: rise .4s ease both;
+  }
+  .card:active{ transform: scale(0.98); }
+  .card.in-cart{ border-color: rgba(255,122,26,0.45); }
 
-        .btn-counter {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f2);
-            color: var(--tg-theme-button-color, #0071e3);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 8px;
-            width: 36px;
-            height: 34px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+  .product-media{
+    width: 100%;
+    height: 112px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .product-media img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .product-media.icon{ font-size: 40px; }
 
-        .counter-value {
-            font-size: 16px;
-            font-weight: 600;
-            min-width: 24px;
-            text-align: center;
-        }
+  .title{
+    font-size: 13.5px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 3px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    line-height: 1.2;
+  }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-    </style>
+  .price{
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--orange-hi);
+    margin-bottom: 12px;
+  }
+
+  .btn-add{
+    background: transparent;
+    color: var(--orange-hi);
+    border: 1px solid rgba(255,122,26,0.45);
+    border-radius: 10px;
+    padding: 9px 14px;
+    width: 100%;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background .15s ease;
+  }
+  .btn-add:active{ background: rgba(255,122,26,0.12); }
+
+  .counter-container{
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .btn-counter{
+    background: var(--surface-2);
+    color: var(--orange-hi);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    width: 34px;
+    height: 32px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .counter-value{
+    font-family: var(--mono);
+    font-size: 15px;
+    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+  }
+
+  .footer-note{
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    opacity: 0.6;
+    margin-top: 20px;
+    letter-spacing: 0.06em;
+    padding-bottom: 70px;
+  }
+
+  /* ---------- CART FAB ---------- */
+  .cart-fab{
+    position: fixed;
+    right: 18px;
+    bottom: 22px;
+    z-index: 30;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,122,26,0.4);
+    background: linear-gradient(160deg, var(--orange-hi), var(--orange));
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(255,122,26,0.35);
+    transition: transform .15s ease;
+  }
+  .cart-fab.visible{ display: flex; }
+  .cart-fab:active{ transform: scale(0.94); }
+  .cart-fab-badge{
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 5px;
+    border-radius: 11px;
+    background: #14100a;
+    color: var(--orange-hi);
+    border: 1px solid rgba(255,122,26,0.5);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- SUPPORT TAB ---------- */
+  .support-tab{
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: none;
+    border-radius: 0 14px 14px 0;
+    padding: 12px 8px 14px;
+    cursor: pointer;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.35);
+    transition: padding-left .15s ease, border-color .15s ease;
+    text-decoration: none;
+  }
+  .support-tab:active{ padding-left: 6px; }
+  .support-tab .support-led{
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--lcd);
+    box-shadow: 0 0 6px var(--lcd);
+    animation: blink 1.4s infinite;
+  }
+  .support-tab .support-icon{ font-size: 18px; line-height: 1; }
+  .support-tab .support-label{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .support-tab:hover .support-label,
+  .support-tab:active .support-label{ color: var(--orange-hi); }
+  .support-tab:hover,
+  .support-tab:active{ border-color: rgba(255,122,26,0.35); }
+
+  @media (prefers-reduced-motion: reduce){
+    .support-tab .support-led{ animation: none; }
+  }
+
+  /* ---------- CART DRAWER ---------- */
+  .cart-overlay{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease;
+  }
+  .cart-overlay.open{ opacity: 1; pointer-events: auto; }
+
+  .cart-drawer{
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 41;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 22px 22px 0 0;
+    padding: 10px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+    max-height: 78vh;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(105%);
+    transition: transform .28s cubic-bezier(.32,.72,.35,1);
+    box-shadow: 0 -18px 40px rgba(0,0,0,0.45);
+  }
+  .cart-drawer.open{ transform: translateY(0); }
+
+  .cart-drawer-handle{
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--line);
+    margin: 4px auto 12px;
+  }
+
+  .cart-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .cart-close{
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text-dim);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .cart-items{
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 4px;
+  }
+
+  .cart-empty{
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    padding: 30px 10px 20px;
+  }
+
+  .cart-row{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 10px;
+  }
+  .cart-row-media{
+    width: 46px; height: 46px;
+    border-radius: 10px;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .cart-row-media img{ width: 100%; height: 100%; object-fit: cover; }
+
+  .cart-row-info{
+    flex: 1;
+    min-width: 0;
+  }
+  .cart-row-title{
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cart-row-price{
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--orange-hi);
+  }
+
+  .cart-row-controls{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .cart-row-controls .btn-counter{ width: 28px; height: 28px; font-size: 14px; }
+  .cart-row-controls .counter-value{ font-size: 13px; min-width: 18px; }
+
+  .cart-row-remove{
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .cart-summary{
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .cart-total-row{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--mono);
+    margin-bottom: 12px;
+  }
+  .cart-total-row span:first-child{
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .cart-total-row span:last-child{
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--orange-hi);
+  }
+
+  .btn-pay{
+    width: 100%;
+    background: linear-gradient(180deg, var(--orange-hi), var(--orange));
+    color: #14100a;
+    border: none;
+    border-radius: 14px;
+    padding: 15px;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(255,122,26,0.28);
+    transition: transform .15s ease;
+  }
+  .btn-pay:active{ transform: scale(0.98); }
+  .btn-pay:disabled{
+    opacity: 0.4;
+    box-shadow: none;
+    cursor: default;
+  }
+
+  .pay-note{
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    color: var(--text-dim);
+    opacity: 0.6;
+    margin-top: 8px;
+    letter-spacing: 0.03em;
+  }
+
+  @keyframes blink{ 0%,100%{ opacity: 1; } 50%{ opacity: 0.25; } }
+  @keyframes float{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-8px); } }
+  @keyframes rise{ from{ opacity: 0; transform: translateY(10px); } to{ opacity: 1; transform: translateY(0); } }
+
+  @media (prefers-reduced-motion: reduce){
+    .welcome-logo, .boot-eyebrow .dot, .device-caption .led{ animation: none; }
+    .card{ animation: none; }
+  }
+
+</style>
 </head>
 <body>
+
+<!-- ПОДДЕРЖКА -->
+<a id="support-tab" class="support-tab" onclick="openSupport(); return false;" href="#">
+  <span class="support-led"></span>
+  <span class="support-icon">💬</span>
+  <span class="support-label">Поддержка</span>
+</a>
+
 <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
 <div id="welcome-page" class="page active">
-    <div class="welcome-container">
-        <div class="welcome-logo">🚀</div>
-        <div class="welcome-title">Fiskin Tech Store</div>
-        <div class="welcome-desc">Добро пожаловать в магазин будущего! Лучшие гаджеты собраны прямо здесь.</div>
-        <button class="btn-start" onclick="navigateTo('catalog-page')">Перейти к покупкам 👉</button>
-    </div>
+  <div class="welcome-container">
+    <div class="boot-eyebrow"><span class="dot"></span>boot_sequence :: ok</div>
+    <div class="welcome-logo">🐬</div>
+    <div class="welcome-title">FI<span>SKIN</span></div>
+    <div class="welcome-desc">Гаджеты и модули для Flipper Zero. Всё, что нужно для апгрейда — в одном каталоге.</div>
+    <button class="btn-start" onclick="navigateTo('catalog-page')">&gt; Перейти в каталог</button>
+  </div>
 </div>
 
 <!-- ЭКРАН 2: КАТАЛОГ -->
 <div id="catalog-page" class="page">
+
+  <div class="device-frame">
+    <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
     <img class="promo-banner" src="banner.jpg" alt="промо баннер">
-    <h2>🤖 Наш каталог</h2>
-    <div class="categories-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
-        <button class="tab-btn" onclick="filterCategory('gadgets', this)">⌚ Гаджеты</button>
-        <button class="tab-btn" onclick="filterCategory('power', this)">🔌 Зарядки</button>
+    <div class="device-caption"><span><span class="led"></span>ON</span><span>fiskin::catalog v1.0</span></div>
+  </div>
+
+  <div class="section-title">Каталог</div>
+
+  <div class="categories-tabs">
+    <button class="tab-btn active" onclick="filterCategory('all', this)">Все</button>
+    <button class="tab-btn" onclick="filterCategory('devices', this)">Устройства</button>
+    <button class="tab-btn" onclick="filterCategory('modules', this)">Модули</button>
+    <button class="tab-btn" onclick="filterCategory('accessories', this)">Аксессуары</button>
+  </div>
+
+  <div class="products-grid">
+
+    <div class="card" data-category="devices" id="prod-flipper-black">
+      <div class="product-media"><img src="Flipper Zero.jpg" alt="Flipper Zero"></div>
+      <div class="title">Flipper Zero</div>
+      <div class="price">24 900 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('flipper-black', 'Flipper Zero', 24900, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('flipper-black', 'Flipper Zero', 24900, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('flipper-black', 'Flipper Zero', 24900, 1)">+</button>
+      </div>
     </div>
 
-    <div class="products-grid">
-        <!-- Наушники Pro -->
-        <div class="card" data-category="gadgets" id="prod-headphones">
-            <img class="product-img" src="headphones.png" alt="Наушники Pro">
-            <div class="title">Наушники Pro</div>
-            <div class="price">14 900 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Умные Часы X -->
-        <div class="card" data-category="gadgets" id="prod-watch">
-            <img class="product-img" src="watch.png" alt="Умные Часы X">
-            <div class="title">Умные Часы X</div>
-            <div class="price">24 500 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Повербанк 20k -->
-        <div class="card" data-category="power" id="prod-powerbank">
-            <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
-            <div class="title">Повербанк 20k</div>
-            <div class="price">3 200 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Зарядка GaN -->
-        <div class="card" data-category="power" id="prod-charger">
-            <img class="product-img" src="charger.png" alt="Зарядка GaN">
-            <div class="title">Зарядка GaN</div>
-            <div class="price">2 100 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">+</button>
-            </div>
-        </div>
+    <div class="card" data-category="devices" id="prod-flipper-white">
+      <div class="product-media"><img src="flipper-one.jpg" alt="Flipper Zero White"></div>
+      <div class="title">Flipper Zero White</div>
+      <div class="price">22 500 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('flipper-white', 'Flipper Zero White', 22500, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('flipper-white', 'Flipper Zero White', 22500, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('flipper-white', 'Flipper Zero White', 22500, 1)">+</button>
+      </div>
     </div>
+
+    <div class="card" data-category="modules" id="prod-wifidev">
+      <div class="product-media icon">📡</div>
+      <div class="title">Wi-Fi Dev Board</div>
+      <div class="price">2 800 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('wifidev', 'Wi-Fi Dev Board', 2800, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('wifidev', 'Wi-Fi Dev Board', 2800, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('wifidev', 'Wi-Fi Dev Board', 2800, 1)">+</button>
+      </div>
+    </div>
+
+    <div class="card" data-category="modules" id="prod-gpio">
+      <div class="product-media icon">🔌</div>
+      <div class="title">GPIO Expansion</div>
+      <div class="price">3 400 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('gpio', 'GPIO Expansion', 3400, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('gpio', 'GPIO Expansion', 3400, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('gpio', 'GPIO Expansion', 3400, 1)">+</button>
+      </div>
+    </div>
+
+    <div class="card" data-category="modules" id="prod-nfc">
+      <div class="product-media icon">🪪</div>
+      <div class="title">NFC Cards (10 шт)</div>
+      <div class="price">1 200 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('nfc', 'NFC Cards (10 шт)', 1200, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('nfc', 'NFC Cards (10 шт)', 1200, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('nfc', 'NFC Cards (10 шт)', 1200, 1)">+</button>
+      </div>
+    </div>
+
+    <div class="card" data-category="accessories" id="prod-case">
+      <div class="product-media icon">🛡️</div>
+      <div class="title">Силиконовый чехол</div>
+      <div class="price">900 ₽</div>
+      <button class="btn-add" onclick="changeQuantity('case', 'Силиконовый чехол', 900, 1)">В корзину</button>
+      <div class="counter-container">
+        <button class="btn-counter" onclick="changeQuantity('case', 'Силиконовый чехол', 900, -1)">–</button>
+        <span class="counter-value">0</span>
+        <button class="btn-counter" onclick="changeQuantity('case', 'Силиконовый чехол', 900, 1)">+</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-note">Зачем ты это читаешь'?</div>
+
 </div>
-<!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
-<div id="welcome-page" class="page active">
-    <div class="welcome-container">
-        <div class="welcome-logo">🚀</div>
-        <div class="welcome-title">Fiskin Tech Store</div>
-        <div class="welcome-desc">Добро пожаловать в магазин будущего! Лучшие гаджеты собраны прямо здесь.</div>
-        <button class="btn-start" onclick="navigateTo('catalog-page')">Перейти к покупкам 👉</button>
-    </div>
+
+<!-- КОРЗИНА -->
+<button id="cart-fab" class="cart-fab" onclick="openCart()">
+  🛒<span id="cart-fab-badge" class="cart-fab-badge">0</span>
+</button>
+
+<div id="cart-overlay" class="cart-overlay" onclick="closeCart()"></div>
+<div id="cart-drawer" class="cart-drawer">
+  <div class="cart-drawer-handle"></div>
+  <div class="cart-header">
+    <span>Корзина</span>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div id="cart-items" class="cart-items"></div>
+  <div class="cart-summary">
+    <div class="cart-total-row"><span>Итого</span><span id="cart-total-value">0 ₽</span></div>
+    <button id="cart-pay-btn" class="btn-pay" onclick="checkout()" disabled>Оплатить</button>
+    <div class="pay-note">Оплата через Telegram Payments — счёт придёт в чат с ботом</div>
+  </div>
 </div>
 
-<!-- ЭКРАН 2: КАТАЛОГ -->
-<div id="catalog-page" class="page">
-    <h2>Каталог Магазина</h2>
-    <div class="categories-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)"> Все товары</button>
-        <button class="tab-btn" onclick="filterCategory('gadgets', this)">Флипперы</button>
-        <button class="tab-btn" onclick="filterCategory('power', this)">Зарядки</button>
-    </div>
-
-    <div class="products-grid">
-        <!-- Наушники Pro -->
-        <div class="card" data-category="gadgets" id="prod-headphones">
-            <img class="product-img" src="headphones.png" alt="Наушники Pro">
-            <div class="title">Наушники Pro</div>
-            <div class="price">14 900 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Умные Часы X -->
-        <div class="card" data-category="gadgets" id="prod-watch">
-            <img class="product-img" src="watch.png" alt="Умные Часы X">
-            <div class="title">Умные Часы X</div>
-            <div class="price">24 500 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Повербанк 20k -->
-        <div class="card" data-category="power" id="prod-powerbank">
-            <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
-            <div class="title">Повербанк 20k</div>
-            <div class="price">3 200 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">+</button>
-            </div>
-        </div>
-
-        <!-- Зарядка GaN -->
-        <div class="card" data-category="power" id="prod-charger">
-            <img class="product-img" src="charger.png" alt="Зарядка GaN">
-            <div class="title">Зарядка GaN</div>
-            <div class="price">2 100 ₽</div>
-            <button class="btn-add" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">В корзину</button>
-            <div class="counter-container">
-                <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, -1)">-</button>
-                <span class="counter-value">0</span>
-                <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">+</button>
-            </div>
-        </div>
-    </div>
-</div>
 <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    let cart = {};
+  const tg = window.Telegram ? window.Telegram.WebApp : null;
+  if (tg) tg.expand();
 
-    function navigateTo(pageId) {
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        if (pageId === 'welcome-page') {
-            tg.MainButton.hide();
-        } else if (pageId === 'catalog-page' && calculateTotal() > 0) {
-            tg.MainButton.show();
-        }
+  // Юзернейм оператора в Telegram
+  const SUPPORT_USERNAME = 'NigaSupport';
+
+  function openSupport() {
+    const url = `https://t.me/${SUPPORT_USERNAME}`;
+    if (tg && tg.openTelegramLink) {
+      tg.openTelegramLink(url);
+    } else {
+      window.open(url, '_blank');
     }
+  }
 
-    function filterCategory(category, button) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        document.querySelectorAll('.card').forEach(card => {
-            if (category === 'all' || card.getAttribute('data-category') === category) {
-                card.style.display = 'flex';
-            } else {
-                card.style.display = 'none';
-            }
-        });
-    }
+  // Превью для карточек в корзине (совпадает с медиа товара в каталоге)
+  const productMedia = {
+    'flipper-black': { type: 'img', src: 'Flipper Zero.jpg' },
+    'flipper-white': { type: 'img', src: 'flipper-one.jpg' },
+    'wifidev':       { type: 'icon', icon: '📡' },
+    'gpio':          { type: 'icon', icon: '🔌' },
+    'nfc':           { type: 'icon', icon: '🪪' },
+    'case':          { type: 'icon', icon: '🛡️' }
+  };
 
-    function changeQuantity(id, name, price, delta) {
-        if (!cart[id]) {
-            cart[id] = {name: name, price: price, count: 0};
-        }
-        cart[id].count += delta;
+  let cart = {};
 
-        const card = document.getElementById(`prod-${id}`);
-        const btnAdd = card.querySelector('.btn-add');
-        const counterContainer = card.querySelector('.counter-container');
-        const counterValue = card.querySelector('.counter-value');
+  function navigateTo(pageId) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+  }
 
-        if (cart[id].count > 0) {
-            btnAdd.style.display = 'none';
-            counterContainer.style.display = 'flex';
-            counterValue.innerText = cart[id].count;
-        } else {
-            delete cart[id];
-            btnAdd.style.display = 'block';
-            counterContainer.style.display = 'none';
-        }
-        updateMainButton();
-    }
-
-    function calculateTotal() {
-        let total = 0;
-        for (let id in cart) {
-            total += cart[id].price * cart[id].count;
-        }
-        return total;
-    }
-
-    function updateMainButton() {
-        const total = calculateTotal();
-        if (total > 0) {
-            tg.MainButton.text = `🛒 Оформить заказ: ${total.toLocaleString()} ₽`;
-            tg.MainButton.textColor = '#ffffff';
-            tg.MainButton.color = '#2ec76e';
-            tg.MainButton.show();
-        } else {
-            tg.MainButton.hide();
-        }
-    }
-
-    tg.onEvent('mainButtonClicked', function () {
-        let itemsToSend = [];
-        for (let id in cart) {
-            itemsToSend.push({name: `${cart[id].name} (x${cart[id].count})`, price: cart[id].price * cart[id].count});
-        }
-        const dataToSend = {items: itemsToSend, total: calculateTotal()};
-        tg.sendData(JSON.stringify(dataToSend));
-        tg.close();
+  function filterCategory(category, button) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+    document.querySelectorAll('.card').forEach(card => {
+      if (category === 'all' || card.getAttribute('data-category') === category) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
     });
+  }
+
+  function changeQuantity(id, name, price, delta) {
+    if (!cart[id]) {
+      cart[id] = { name: name, price: price, count: 0 };
+    }
+    cart[id].count += delta;
+
+    const card = document.getElementById(`prod-${id}`);
+    const btnAdd = card.querySelector('.btn-add');
+    const counterContainer = card.querySelector('.counter-container');
+    const counterValue = card.querySelector('.counter-value');
+
+    if (cart[id].count > 0) {
+      btnAdd.style.display = 'none';
+      counterContainer.style.display = 'flex';
+      counterValue.innerText = cart[id].count;
+      card.classList.add('in-cart');
+    } else {
+      delete cart[id];
+      btnAdd.style.display = 'block';
+      counterContainer.style.display = 'none';
+      card.classList.remove('in-cart');
+    }
+
+    renderCart();
+  }
+
+  function removeItem(id) {
+    if (!cart[id]) return;
+    changeQuantity(id, cart[id].name, cart[id].price, -cart[id].count);
+  }
+
+  function calculateTotal() {
+    let total = 0;
+    for (let id in cart) {
+      total += cart[id].price * cart[id].count;
+    }
+    return total;
+  }
+
+  function calculateItemCount() {
+    let count = 0;
+    for (let id in cart) count += cart[id].count;
+    return count;
+  }
+
+  function renderCart() {
+    const itemsCount = calculateItemCount();
+    const total = calculateTotal();
+
+    // FAB
+    const fab = document.getElementById('cart-fab');
+    const badge = document.getElementById('cart-fab-badge');
+    badge.innerText = itemsCount;
+    fab.classList.toggle('visible', itemsCount > 0);
+
+    // Итог + кнопка оплаты
+    document.getElementById('cart-total-value').innerText = `${total.toLocaleString()} ₽`;
+    document.getElementById('cart-pay-btn').disabled = itemsCount === 0;
+
+    // Список позиций
+    const itemsWrap = document.getElementById('cart-items');
+    const ids = Object.keys(cart);
+
+    if (ids.length === 0) {
+      itemsWrap.innerHTML = '<div class="cart-empty">Корзина пуста — добавьте что-нибудь из каталога</div>';
+      return;
+    }
+
+    itemsWrap.innerHTML = ids.map(id => {
+      const item = cart[id];
+      const media = productMedia[id];
+      const mediaHtml = media && media.type === 'img'
+        ? `<img src="${media.src}" alt="${item.name}">`
+        : (media ? media.icon : '📦');
+
+      return `
+        <div class="cart-row">
+          <div class="cart-row-media">${mediaHtml}</div>
+          <div class="cart-row-info">
+            <div class="cart-row-title">${item.name}</div>
+            <div class="cart-row-price">${(item.price * item.count).toLocaleString()} ₽</div>
+          </div>
+          <div class="cart-row-controls">
+            <button class="btn-counter" onclick="changeQuantity('${id}', '${item.name}', ${item.price}, -1)">–</button>
+            <span class="counter-value">${item.count}</span>
+            <button class="btn-counter" onclick="changeQuantity('${id}', '${item.name}', ${item.price}, 1)">+</button>
+          </div>
+          <button class="cart-row-remove" onclick="removeItem('${id}')">✕</button>
+        </div>`;
+    }).join('');
+  }
+
+  function openCart() {
+    document.getElementById('cart-overlay').classList.add('open');
+    document.getElementById('cart-drawer').classList.add('open');
+  }
+
+  function closeCart() {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-drawer').classList.remove('open');
+  }
+
+  // Оплата: мини-апп сам не может списать деньги с карты — это делает бот
+  // через Telegram Payments API. Здесь мы просто передаём боту содержимое
+  // корзины через sendData; бот на своей стороне создаёт счёт (invoice) и
+  // присылает его в чат, где пользователь уже подтверждает оплату.
+  function checkout() {
+    if (calculateItemCount() === 0) return;
+
+    const itemsToSend = Object.keys(cart).map(id => ({
+      name: `${cart[id].name} (x${cart[id].count})`,
+      price: cart[id].price * cart[id].count
+    }));
+    const dataToSend = { items: itemsToSend, total: calculateTotal() };
+
+    if (tg) {
+      tg.sendData(JSON.stringify(dataToSend));
+      tg.close();
+    } else {
+      // Режим предпросмотра вне Telegram — просто показываем, что уйдёт боту
+      alert('Заказ отправлен боту:\n' + JSON.stringify(dataToSend, null, 2));
+    }
+  }
+
+  renderCart();
 </script>
+
 </body>
 </html>

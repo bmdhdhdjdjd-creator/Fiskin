@@ -15,41 +15,17 @@
             -webkit-user-select: none; user-select: none;
         }
 
-        /* 🏠 СТИЛИ ДЛЯ ЛИЦЕВОЙ ЧАСТИ (ГЛАВНЫЙ ЭКРАН) */
-        .page {
-            display: none; /* По умолчанию скрываем все страницы */
-            padding: 16px;
-            box-sizing: border-box;
-        }
-        .page.active {
-            display: block; /* Показываем только активную страницу */
-        }
+        .page { display: none; padding: 16px; box-sizing: border-box; }
+        .page.active { display: block; }
 
         .welcome-container {
-            text-align: center;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 70vh;
+            text-align: center; padding: 40px 20px; display: flex;
+            flex-direction: column; align-items: center; justify-content: center; min-height: 70vh;
         }
-        .welcome-logo {
-            font-size: 72px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-        .welcome-title {
-            font-size: 26px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        .welcome-desc {
-            font-size: 15px;
-            color: #8e8e93;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
+        .welcome-logo { font-size: 72px; margin-bottom: 20px; animation: bounce 2s infinite; }
+        .welcome-title { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+        .welcome-desc { font-size: 15px; color: #8e8e93; margin-bottom: 30px; line-height: 1.4; }
+
         .btn-start {
             background-color: var(--tg-theme-button-color, #0071e3);
             color: var(--tg-theme-button-text-color, #fff);
@@ -59,59 +35,61 @@
             box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
         }
 
-        /* 🛍️ СТИЛИ ДЛЯ КАТАЛОГА ТОВАРОВ */
         h2 { text-align: center; margin-top: 10px; font-size: 22px; }
 
-        .categories-tabs {
-            display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px;
-            scrollbar-width: none;
-        }
+        .categories-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; scrollbar-width: none; }
         .categories-tabs::-webkit-scrollbar { display: none; }
 
         .tab-btn {
             background-color: var(--tg-theme-secondary-bg-color, #fff);
             color: var(--tg-theme-text-color, #1d1d1f);
             border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
-            padding: 8px 16px; font-size: 14px; font-weight: 500;
-            cursor: pointer; white-space: nowrap;
+            padding: 8px 16px; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
         }
         .tab-btn.active {
             background-color: var(--tg-theme-button-color, #0071e3);
-            color: var(--tg-theme-button-text-color, #fff);
-            border-color: transparent;
+            color: var(--tg-theme-button-text-color, #fff); border-color: transparent;
         }
 
-        .products-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;
-        }
+        .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px; }
+
         .card {
             background-color: var(--tg-theme-secondary-bg-color, #fff);
             border-radius: 16px; padding: 12px; display: flex; flex-direction: column;
             align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
         }
-        .product-img {
-            width: 100%; height: 120px; object-fit: contain;
-            margin-bottom: 10px; border-radius: 8px;
-        }
+        .product-img { width: 100%; height: 120px; object-fit: contain; margin-bottom: 10px; border-radius: 8px; }
         .title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; }
         .price { font-size: 15px; font-weight: bold; color: var(--tg-theme-link-color, #0071e3); margin-bottom: 12px; }
+
         .btn-add {
             background-color: var(--tg-theme-button-color, #0071e3);
             color: var(--tg-theme-button-text-color, #fff);
             border: none; border-radius: 8px; padding: 8px 16px; width: 100%;
-            font-weight: 500; cursor: pointer;
+            font-weight: 500; cursor: pointer; box-sizing: border-box;
         }
 
-        /* Простая анимация для логотипа */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        /* ➕ / ➖ СТИЛИ ДЛЯ БЛОКА СЧЕТЧИКА ТОВАРОВ */
+        .counter-container {
+            display: none;
+            justify-content: space-between; align-items: center;
+            width: 100%; box-sizing: border-box;
         }
+        .btn-counter {
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f2);
+            color: var(--tg-theme-button-color, #0071e3);
+            border: 1px solid rgba(0,0,0,0.05); border-radius: 8px;
+            width: 36px; height: 34px; font-size: 18px; font-weight: bold;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .counter-value { font-size: 16px; font-weight: 600; min-width: 24px; text-align: center; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
 
-    <!-- 🏠 ЭКРАН 1: ЛИЦЕВАЯ ЧАСТЬ (WELCOME SCREEN) -->
+    <!-- ЭКРАН 1: ПРИВЕТСТВИЕ -->
     <div id="welcome-page" class="page active">
         <div class="welcome-container">
             <div class="welcome-logo">🚀</div>
@@ -121,7 +99,7 @@
         </div>
     </div>
 
-    <!-- 🛍️ ЭКРАН 2: КАТАЛОГ С ТОВАРАМИ -->
+    <!-- ЭКРАН 2: КАТАЛОГ -->
     <div id="catalog-page" class="page">
         <h2>🤖 Наш каталог</h2>
 
@@ -132,59 +110,77 @@
         </div>
 
         <div class="products-grid">
-            <!-- Гаджеты -->
-            <div class="card" data-category="gadgets">
+            <!-- Наушники Pro -->
+            <div class="card" data-category="gadgets" id="prod-headphones">
                 <img class="product-img" src="headphones.png" alt="Наушники Pro">
                 <div class="title">Наушники Pro</div>
                 <div class="price">14 900 ₽</div>
-                <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
+                <button class="btn-add" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">В корзину</button>
+                <div class="counter-container">
+                    <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, -1)">-</button>
+                    <span class="counter-value">0</span>
+                    <button class="btn-counter" onclick="changeQuantity('headphones', 'Наушники Pro', 14900, 1)">+</button>
+                </div>
             </div>
-            <div class="card" data-category="gadgets">
+
+            <!-- Умные Часы X -->
+            <div class="card" data-category="gadgets" id="prod-watch">
                 <img class="product-img" src="watch.png" alt="Умные Часы X">
                 <div class="title">Умные Часы X</div>
                 <div class="price">24 500 ₽</div>
-                <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
+                <button class="btn-add" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">В корзину</button>
+                <div class="counter-container">
+                    <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, -1)">-</button>
+                    <span class="counter-value">0</span>
+                    <button class="btn-counter" onclick="changeQuantity('watch', 'Умные Часы X', 24500, 1)">+</button>
+                </div>
             </div>
 
-            <!-- Зарядки -->
-            <div class="card" data-category="power">
+            <!-- Повербанк 20k -->
+            <div class="card" data-category="power" id="prod-powerbank">
                 <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
                 <div class="title">Повербанк 20k</div>
                 <div class="price">3 200 ₽</div>
-                <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
+                <button class="btn-add" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">В корзину</button>
+                <div class="counter-container">
+                    <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, -1)">-</button>
+                    <span class="counter-value">0</span>
+                    <button class="btn-counter" onclick="changeQuantity('powerbank', 'Повербанк 20k', 3200, 1)">+</button>
+                </div>
             </div>
-            <div class="card" data-category="power">
+
+            <!-- Зарядка GaN -->
+            <div class="card" data-category="power" id="prod-charger">
                 <img class="product-img" src="charger.png" alt="Зарядка GaN">
                 <div class="title">Зарядка GaN</div>
                 <div class="price">2 100 ₽</div>
-                <button class="btn-add" onclick="addToCart('Зарядка GaN', 2100)">В корзину</button>
+                <button class="btn-add" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">В корзину</button>
+                <div class="counter-container">
+                    <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, -1)">-</button>
+                    <span class="counter-value">0</span>
+                    <button class="btn-counter" onclick="changeQuantity('charger', 'Зарядка GaN', 2100, 1)">+</button>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let cart = [];
-        let total = 0;
+        // Объект корзины, где ключ — ID товара, а значение — данные о покупке
+        let cart = {};
 
-        // 🔄 НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ
         function navigateTo(pageId) {
-            // Скрываем все страницы
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            // Показываем нужную страницу
             document.getElementById(pageId).classList.add('active');
 
-            // Если вернулись на главный экран — скрываем кнопку Telegram, если перешли в каталог и корзина не пуста — показываем
             if (pageId === 'welcome-page') {
                 tg.MainButton.hide();
-            } else if (pageId === 'catalog-page' && total > 0) {
+            } else if (pageId === 'catalog-page' && calculateTotal() > 0) {
                 tg.MainButton.show();
             }
         }
 
-        // ФИЛЬТР КАТЕГОРИЙ
         function filterCategory(category, button) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -198,19 +194,72 @@
             });
         }
 
-        // КОРЗИНА
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            total += price;
+        // ФУНКЦИЯ ИЗМЕНЕНИЯ КОЛИЧЕСТВА ТОВАРОВ
+        function changeQuantity(id, name, price, delta) {
+            if (!cart[id]) {
+                cart[id] = { name: name, price: price, count: 0 };
+            }
 
-            tg.MainButton.text = `🛒 Оформить заказ: ${total.toLocaleString()} ₽`;
-            tg.MainButton.textColor = '#ffffff';
-            tg.MainButton.color = '#2ec76e';
-            tg.MainButton.show();
+            cart[id].count += delta;
+
+            const card = document.getElementById(`prod-${id}`);
+            const btnAdd = card.querySelector('.btn-add');
+            const counterContainer = card.querySelector('.counter-container');
+            const counterValue = card.querySelector('.counter-value');
+
+            if (cart[id].count > 0) {
+                // Показываем счетчик вместо кнопки "В корзину"
+                btnAdd.style.display = 'none';
+                counterContainer.style.display = 'flex';
+                counterValue.innerText = cart[id].count;
+            } else {
+                // Если количество упало до 0 — возвращаем кнопку "В корзину"
+                delete cart[id];
+                btnAdd.style.display = 'block';
+                counterContainer.style.display = 'none';
+            }
+
+            updateMainButton();
+        }
+
+        // Подсчет общей стоимости
+        function calculateTotal() {
+            let total = 0;
+            for (let id in cart) {
+                total += cart[id].price * cart[id].count;
+            }
+            return total;
+        }
+
+        // Обновление главной кнопки Telegram
+        function updateMainButton() {
+            const total = calculateTotal();
+            if (total > 0) {
+                tg.MainButton.text = `🛒 Оформить заказ: ${total.toLocaleString()} ₽`;
+                tg.MainButton.textColor = '#ffffff';
+                tg.MainButton.color = '#2ec76e';
+                tg.MainButton.show();
+            } else {
+                tg.MainButton.hide();
+            }
         }
 
         tg.onEvent('mainButtonClicked', function() {
-            const dataToSend = { items: cart, total: total };
+            // Превращаем объект корзины в плоский список для отправки боту
+            let itemsToSend = [];
+            for (let id in cart) {
+                // Если пользователь взял несколько штук, добавим в текст количество
+                itemsToSend.push({
+                    name: `${cart[id].name} (x${cart[id].count})`,
+                    price: cart[id].price * cart[id].count
+                });
+            }
+
+            const dataToSend = {
+                items: itemsToSend,
+                total: calculateTotal()
+            };
+
             tg.sendData(JSON.stringify(dataToSend));
             tg.close();
         });

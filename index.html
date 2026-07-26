@@ -173,10 +173,10 @@
         function navigateTo(pageId) {
             // Скрываем все страницы
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            # Показываем нужную страницу
+            // Показываем нужную страницу
             document.getElementById(pageId).classList.add('active');
 
-            # Если вернулись на главный экран — скрываем кнопку Telegram, если перешли в каталог и корзина не пуста — показываем
+            // Если вернулись на главный экран — скрываем кнопку Telegram, если перешли в каталог и корзина не пуста — показываем
             if (pageId === 'welcome-page') {
                 tg.MainButton.hide();
             } else if (pageId === 'catalog-page' && total > 0) {

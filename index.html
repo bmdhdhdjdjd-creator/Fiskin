@@ -11,12 +11,57 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--tg-theme-bg-color, #f5f5f7);
             color: var(--tg-theme-text-color, #1d1d1f);
-            margin: 0; padding: 16px;
+            margin: 0; padding: 0;
             -webkit-user-select: none; user-select: none;
         }
+
+        /* 🏠 СТИЛИ ДЛЯ ЛИЦЕВОЙ ЧАСТИ (ГЛАВНЫЙ ЭКРАН) */
+        .page {
+            display: none; /* По умолчанию скрываем все страницы */
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .page.active {
+            display: block; /* Показываем только активную страницу */
+        }
+
+        .welcome-container {
+            text-align: center;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+        }
+        .welcome-logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        .welcome-title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .welcome-desc {
+            font-size: 15px;
+            color: #8e8e93;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+        .btn-start {
+            background-color: var(--tg-theme-button-color, #0071e3);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none; border-radius: 12px;
+            padding: 16px 32px; font-size: 16px; font-weight: 600;
+            cursor: pointer; width: 100%; max-width: 280px;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3);
+        }
+
+        /* 🛍️ СТИЛИ ДЛЯ КАТАЛОГА ТОВАРОВ */
         h2 { text-align: center; margin-top: 10px; font-size: 22px; }
 
-        /* Стили для кнопок категорий */
         .categories-tabs {
             display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px;
             scrollbar-width: none;
@@ -28,7 +73,7 @@
             color: var(--tg-theme-text-color, #1d1d1f);
             border: 1px solid rgba(0,0,0,0.05); border-radius: 20px;
             padding: 8px 16px; font-size: 14px; font-weight: 500;
-            cursor: pointer; white-space: nowrap; transition: all 0.2s;
+            cursor: pointer; white-space: nowrap;
         }
         .tab-btn.active {
             background-color: var(--tg-theme-button-color, #0071e3);
@@ -36,7 +81,6 @@
             border-color: transparent;
         }
 
-        /* Сетка товаров */
         .products-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;
         }
@@ -44,67 +88,77 @@
             background-color: var(--tg-theme-secondary-bg-color, #fff);
             border-radius: 16px; padding: 12px; display: flex; flex-direction: column;
             align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            transition: all 0.2s;
-            position: relative; overflow: hidden;
         }
-
-        /*  НОВЫЕ СТИЛИ ДЛЯ ФОТОГРАФИЙ */
         .product-img {
-            width: 100%;
-            height: 120px;
-            object-fit: contain; /* Картинка пропорционально впишется в блок */
-            margin-bottom: 10px;
-            border-radius: 8px;
+            width: 100%; height: 120px; object-fit: contain;
+            margin-bottom: 10px; border-radius: 8px;
         }
-
         .title { font-size: 14px; font-weight: 600; text-align: center; margin-bottom: 4px; }
         .price { font-size: 15px; font-weight: bold; color: var(--tg-theme-link-color, #0071e3); margin-bottom: 12px; }
         .btn-add {
             background-color: var(--tg-theme-button-color, #0071e3);
             color: var(--tg-theme-button-text-color, #fff);
             border: none; border-radius: 8px; padding: 8px 16px; width: 100%;
-            font-weight: 500; cursor: pointer; transition: transform 0.1s;
+            font-weight: 500; cursor: pointer;
         }
-        .btn-add:active { transform: scale(0.96); }
+
+        /* Простая анимация для логотипа */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
 
-    <h2>Бурмалда</h2>
-
-    <div class="categories-tabs">
-        <button class="tab-btn active" onclick="filterCategory('all', this)">Все товары</button>
-        <button class="tab-btn" onclick="filterCategory('gadgets', this)">Flipper</button>
-        <button class="tab-btn" onclick="filterCategory('power', this)">Зарядки</button>
+    <!-- 🏠 ЭКРАН 1: ЛИЦЕВАЯ ЧАСТЬ (WELCOME SCREEN) -->
+    <div id="welcome-page" class="page active">
+        <div class="welcome-container">
+            <div class="welcome-logo">🚀</div>
+            <div class="welcome-title">Fiskin Tech Store</div>
+            <div class="welcome-desc">Добро пожаловать в магазин будущего! Лучшие гаджеты и аксессуары собраны прямо здесь.</div>
+            <button class="btn-start" onclick="navigateTo('catalog-page')">Перейти к покупкам 👉</button>
+        </div>
     </div>
 
-    <div class="products-grid">
-        <!-- Гаджеты -->
-        <div class="card" data-category="gadgets">
-            <img class="product-img" src="Flipper Zero.jpg" alt="Наушники Pro">
-            <div class="title">Flipper Zero</div>
-            <div class="price">25 000 ₽</div>
-            <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
-        </div>
-        <div class="card" data-category="gadgets">
-            <img class="product-img" src="flipper-one.jpg" alt="Умные Часы X">
-            <div class="title">Flipper One</div>
-            <div class="price">60 000 ₽</div>
-            <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
+    <!-- 🛍️ ЭКРАН 2: КАТАЛОГ С ТОВАРАМИ -->
+    <div id="catalog-page" class="page">
+        <h2>🤖 Наш каталог</h2>
+
+        <div class="categories-tabs">
+            <button class="tab-btn active" onclick="filterCategory('all', this)">✨ Все</button>
+            <button class="tab-btn" onclick="filterCategory('gadgets', this)">⌚ Гаджеты</button>
+            <button class="tab-btn" onclick="filterCategory('power', this)">🔌 Зарядки</button>
         </div>
 
-        <!-- Зарядки -->
-        <div class="card" data-category="power">
-            <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
-            <div class="title">Повербанк</div>
-            <div class="price">3 200 ₽</div>
-            <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
-        </div>
-        <div class="card" data-category="power">
-            <img class="product-img" src="charger.png" alt="Зарядка GaN">
-            <div class="title">Зарядка GaN</div>
-            <div class="price">2 100 ₽</div>
-            <button class="btn-add" onclick="addToCart('Зарядка GaN', 2100)">В корзину</button>
+        <div class="products-grid">
+            <!-- Гаджеты -->
+            <div class="card" data-category="gadgets">
+                <img class="product-img" src="headphones.png" alt="Наушники Pro">
+                <div class="title">Наушники Pro</div>
+                <div class="price">14 900 ₽</div>
+                <button class="btn-add" onclick="addToCart('Наушники Pro', 14900)">В корзину</button>
+            </div>
+            <div class="card" data-category="gadgets">
+                <img class="product-img" src="watch.png" alt="Умные Часы X">
+                <div class="title">Умные Часы X</div>
+                <div class="price">24 500 ₽</div>
+                <button class="btn-add" onclick="addToCart('Умные Часы X', 24500)">В корзину</button>
+            </div>
+
+            <!-- Зарядки -->
+            <div class="card" data-category="power">
+                <img class="product-img" src="powerbank.png" alt="Повербанк 20k">
+                <div class="title">Повербанк 20k</div>
+                <div class="price">3 200 ₽</div>
+                <button class="btn-add" onclick="addToCart('Повербанк 20k', 3200)">В корзину</button>
+            </div>
+            <div class="card" data-category="power">
+                <img class="product-img" src="charger.png" alt="Зарядка GaN">
+                <div class="title">Зарядка GaN</div>
+                <div class="price">2 100 ₽</div>
+                <button class="btn-add" onclick="addToCart('Зарядка GaN', 2100)">В корзину</button>
+            </div>
         </div>
     </div>
 
@@ -115,6 +169,22 @@
         let cart = [];
         let total = 0;
 
+        // 🔄 НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ
+        function navigateTo(pageId) {
+            // Скрываем все страницы
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            # Показываем нужную страницу
+            document.getElementById(pageId).classList.add('active');
+
+            # Если вернулись на главный экран — скрываем кнопку Telegram, если перешли в каталог и корзина не пуста — показываем
+            if (pageId === 'welcome-page') {
+                tg.MainButton.hide();
+            } else if (pageId === 'catalog-page' && total > 0) {
+                tg.MainButton.show();
+            }
+        }
+
+        // ФИЛЬТР КАТЕГОРИЙ
         function filterCategory(category, button) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -128,6 +198,7 @@
             });
         }
 
+        // КОРЗИНА
         function addToCart(name, price) {
             cart.push({ name, price });
             total += price;
